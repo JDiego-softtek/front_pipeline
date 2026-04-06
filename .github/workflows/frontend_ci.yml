@@ -33,15 +33,15 @@ jobs:
           #cache-dependency-path: membership-platform-dev/frontend/package-lock.json
 
       - name: Install dependencies
-        working-directory: membership-platform-dev/frontend
+        working-directory: membership-platform-dev/membership-platform-dev/frontend
         run: npm ci
 
       - name: Security audit
-        working-directory: membership-platform-dev/frontend
+        working-directory: membership-platform-dev/membership-platform-dev/frontend
         run: npm audit --audit-level=high
 
       - name: Run linter
-        working-directory: membership-platform-dev/frontend
+        working-directory: membership-platform-dev/membership-platform-dev/frontend
         run: npm run lint
 
       - name: Authenticate with Azure
