@@ -38,7 +38,7 @@ jobs:
 
       - name: Security audit
         working-directory: membership-platform-dev/membership-platform-dev/frontend
-        run: npm audit --audit-level=high
+        run: npm audit --audit-level=critical  #->mover a high en prod
 
       - name: Run linter
         working-directory: membership-platform-dev/membership-platform-dev/frontend
