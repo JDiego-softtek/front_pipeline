@@ -1,0 +1,53 @@
+/*
+    Our design system leverages a purposeful set of typographic styles. We’ve stress-tested 
+    this typographic scale across dozens of projects to make sure it’s robust enough to use 
+    across (almost) any project, while remaining as accessible as possible for everyone.
+    URL: https://fonts.google.com/specimen/Fira+Sans
+*/
+
+:root {
+    /* Headings */
+    /* --font-size-h1: 2.5rem; /* 40px */
+    /* --font-size-h2: 2rem;   /* 32px */
+    /* --font-size-h3: 1.75rem;/* 28px */
+    /* --font-size-h4: 1.5rem; /* 24px */
+    /* --font-size-h5: 1.25rem;/* 20px */
+    /* --font-size-h6: 1rem;   /* 16px */
+
+    /* Body Text */
+    /* --font-size-body-large: 1.125rem; /* 18px /*
+    /* --font-size-body-regular: 1rem;    /* 16px */
+    /* --font-size-body-small: 0.875rem;  /* 14px */
+
+    /* Font Weight */
+    --font-weight-regular: 400;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
+
+    /* Font Size */
+    --font-size-display-2xl: 72px; /* 4.50rem */
+    --font-size-display-xl: 60px; /* 3.75rem */
+    --font-size-display-lg: 48px; /* 3.00rem */
+    --font-size-display-md: 36px; /* 2.25rem */
+    --font-size-display-sm: 30px; /* 1.875rem */
+    --font-size-display-xs: 24px; /* 1.50rem */
+    --font-size-text-xl: 20px; /* 1.25rem */
+    --font-size-text-lg: 18px; /* 1.125rem */
+    --font-size-text-md: 16px; /* 1.00rem */
+    --font-size-text-sm: 14px; /* 0.875rem */
+    --font-size-text-xs: 12px; /* 0.75rem */
+
+    /* Line Height */
+    --line-height-display-2xl: 90px; /* 5.625rem */
+    --line-height-display-xl: 72px; /* 4.50rem */
+    --line-height-display-lg: 60px; /* 3.75rem */
+    --line-height-display-md: 44px; /* 2.75rem */
+    --line-height-display-sm: 38px; /* 2.375rem */
+    --line-height-display-xs: 32px; /* 2.00rem */
+    --line-height-text-xl: 30px; /* 1.875rem */
+    --line-height-text-lg: 28px; /* 1.75rem */
+    --line-height-text-md: 24px; /* 1.5rem */
+    --line-height-text-sm: 20px; /* 1.25rem */
+    --line-height-text-xs: 18px; /* 1.125rem */
+}

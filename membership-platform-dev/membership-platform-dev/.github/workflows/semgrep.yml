@@ -1,0 +1,151 @@
+name: Semgrep Security Scan
+
+on:
+  push:
+    branches: ["main", "develop", "feature/**"]
+    paths:
+      - 'backend/**'
+      - 'frontend/**'
+      - 'infra/**'
+      - 'data/**'
+      - '.github/workflows/semgrep.yml'
+  pull_request:
+    branches: ["main", "develop"]
+    paths:
+      - 'backend/**'
+      - 'frontend/**'
+      - 'infra/**'
+      - 'data/**'
+      - '.github/workflows/semgrep.yml'
+  schedule:
+    - cron: "0 10 * * 1"
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  semgrep:
+    name: Semgrep Scan
+    runs-on: ubuntu-latest
+    container:
+      image: semgrep/semgrep:latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # -------------------------------------------------------
+      # Detect which folders changed
+      # -------------------------------------------------------
+      - name: Get changed folders
+        id: changes
+        run: |
+          echo "backend=false"  >> $GITHUB_OUTPUT
+          echo "frontend=false" >> $GITHUB_OUTPUT
+          echo "infra=false"    >> $GITHUB_OUTPUT
+          echo "data=false"     >> $GITHUB_OUTPUT
+
+          git diff --name-only origin/${{ github.base_ref }}...HEAD 2>/dev/null | while read f; do
+            case "$f" in
+              backend/*)  echo "backend=true"  >> $GITHUB_OUTPUT ;;
+              frontend/*) echo "frontend=true" >> $GITHUB_OUTPUT ;;
+              infra/*)    echo "infra=true"    >> $GITHUB_OUTPUT ;;
+              data/*)     echo "data=true"     >> $GITHUB_OUTPUT ;;
+            esac
+          done || true
+
+      # -------------------------------------------------------
+      # ⚙️ Backend
+      # -------------------------------------------------------
+      - name: Semgrep /backend
+        if: steps.changes.outputs.backend == 'true' || github.event_name == 'schedule'
+        run: |
+          semgrep \
+            --config=p/typescript \
+            --config=p/nodejs \
+            --config=p/security-audit \
+            --config=p/owasp-top-ten \
+            --output=semgrep-backend.txt \
+            --text \
+            --severity=ERROR \
+            --severity=WARNING \
+            ./backend || true
+
+      # -------------------------------------------------------
+      # 🖥️ Frontend
+      # -------------------------------------------------------
+      - name: Semgrep /frontend
+        if: steps.changes.outputs.frontend == 'true' || github.event_name == 'schedule'
+        run: |
+          semgrep \
+            --config=p/typescript \
+            --config=p/react \
+            --config=p/security-audit \
+            --config=p/owasp-top-ten \
+            --output=semgrep-frontend.txt \
+            --text \
+            --severity=ERROR \
+            --severity=WARNING \
+            ./frontend || true
+
+      # -------------------------------------------------------
+      # 🏗️ Infra
+      # -------------------------------------------------------
+      - name: Semgrep /infra
+        if: steps.changes.outputs.infra == 'true' || github.event_name == 'schedule'
+        run: |
+          semgrep \
+            --config=p/terraform \
+            --config=p/security-audit \
+            --output=semgrep-infra.txt \
+            --text \
+            --severity=ERROR \
+            --severity=WARNING \
+            ./infra || true
+
+      # -------------------------------------------------------
+      # 📊 Data
+      # -------------------------------------------------------
+      - name: Semgrep /data
+        if: steps.changes.outputs.data == 'true' || github.event_name == 'schedule'
+        run: |
+          semgrep \
+            --config=p/typescript \
+            --config=p/security-audit \
+            --output=semgrep-data.txt \
+            --text \
+            --severity=ERROR \
+            --severity=WARNING \
+            ./data || true
+
+      # -------------------------------------------------------
+      # Post all results as a single PR comment
+      # -------------------------------------------------------
+      - name: Post results as PR comment
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const sections = [
+              { file: 'semgrep-backend.txt',  label: '⚙️ /backend'  },
+              { file: 'semgrep-frontend.txt', label: '🖥️ /frontend' },
+              { file: 'semgrep-infra.txt',    label: '🏗️ /infra'    },
+              { file: 'semgrep-data.txt',     label: '📊 /data'     },
+            ];
+            const body = sections
+              .filter(s => fs.existsSync(s.file))
+              .map(s => {
+                const out = fs.readFileSync(s.file, 'utf8').trim();
+                return `## ${s.label}\n\`\`\`\n${out || '✅ No issues found.'}\n\`\`\``;
+              })
+              .join('\n\n');
+            if (body) {
+              github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: `# 🔍 Semgrep Security Scan Results\n\n${body}`
+              });
+            }

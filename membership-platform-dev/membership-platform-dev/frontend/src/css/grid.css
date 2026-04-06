@@ -1,0 +1,200 @@
+/*
+    Layout grids define structure, hierarchy, and rhythm in your design. Working from
+    a defined layout system allows you to work faster and more consistently, removing
+    guesswork as you lay out responsive designs.
+*/
+
+:root {
+    /* Desktop grid layout (1,280px) */
+    --grid-desktop-columns: 12;
+    --grid-desktop-gutter: var(--spacing-4); /* 1rem / 16px */
+    --grid-desktop-max-width: var(--width-3xl); /* 80rem / 1,280px */
+    --grid-desktop-padding-vertical: var(--spacing-9xl); /* 6rem / 96px */
+    --grid-desktop-padding-horizontal: var(--spacing-8xl); /* 5rem / 80px */
+
+    /* Tablet grid layout (768px) */
+    --grid-tablet-columns: 8;
+    --grid-tablet-gutter: var(--spacing-4); /* 1rem / 16px */
+    --grid-tablet-max-width: var(--width-2xl); /* 64rem / 1,024px */
+    --grid-tablet-padding-vertical: var(--spacing-6xl); /* 3rem / 48px */
+    --grid-tablet-padding-horizontal: 13.69rem; /* 219px */
+
+    /* Mobile grid layout (390px) */
+    --grid-mobile-columns: 4;
+    --grid-mobile-gutter: var(--spacing-3); /* 0.75rem / 12px */
+    --grid-mobile-max-width: var(--width-sm); /* 30rem / 480px */
+    --grid-mobile-padding-vertical: var(--spacing-5xl); /* 2.5rem / 40px */
+    --grid-mobile-padding-horizontal: 2.34rem; /* 37.5px */
+}
+
+/* Desktop grid container (1,280px max-width) */
+@media (min-width: 1024px) {
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(var(--grid-desktop-columns), 1fr);
+        gap: var(--grid-desktop-gutter);
+        max-width: var(--grid-desktop-max-width);
+        margin: 0 auto;
+        padding: var(--grid-desktop-padding-vertical) var(--grid-desktop-padding-horizontal);
+    }
+
+    /* Desktop grid column span utilities */
+    .grid-col-1 {
+        grid-column: span 1;
+    }
+    .grid-col-2 {
+        grid-column: span 2;
+    }
+    .grid-col-3 {
+        grid-column: span 3;
+    }
+    .grid-col-4 {
+        grid-column: span 4;
+    }
+    .grid-col-6 {
+        grid-column: span 6;
+    }
+    .grid-col-12 {
+        grid-column: span 12;
+    }
+}
+
+/* Tablet grid container (768px max-width) */
+@media (min-width: 768px) and (max-width: 1023px) {
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(var(--grid-tablet-columns), 1fr);
+        gap: var(--grid-tablet-gutter);
+        max-width: var(--grid-tablet-max-width);
+        margin: 0 auto;
+        padding: var(--grid-tablet-padding-vertical) var(--grid-tablet-padding-horizontal);
+    }
+
+    /* Tablet grid column span utilities */
+    .grid-col-1 {
+        grid-column: span 1;
+    }
+    .grid-col-2 {
+        grid-column: span 2;
+    }
+    .grid-col-4 {
+        grid-column: span 4;
+    }
+    .grid-col-8 {
+        grid-column: span 8;
+    }
+}
+
+/* Mobile grid container (390px max-width) */
+@media (max-width: 390px) {
+    .grid {
+        display: flex;
+        padding: 0 37.5px;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        flex: 1 0 0;
+        align-self: stretch;
+        border-radius: var(--spacing-xl, 16px);
+        border: 1px solid var(--Colors-Border-border-primary, #d0d5dd);
+        background: var(--colors-Background-bg-primary, #fff);
+    }
+}
+
+/* Mobile grid container (375px max-width) */
+@media (max-width: 375px) {
+    .grid {
+        display: flex;
+        padding: 0 49.5px 0 50.5px;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        flex: 1 0 0;
+        align-self: stretch;
+        border-radius: var(--spacing-xl, 16px);
+        border: 1px solid var(--Colors-Border-border-primary, #d0d5dd);
+        background: var(--colors-Background-bg-primary, #fff);
+    }
+}
+
+/* Mobile grid container (360px max-width) */
+@media (max-width: 360px) {
+    .grid {
+        display: flex;
+        padding: 0 47.5px;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        flex: 1 0 0;
+        align-self: stretch;
+        border-radius: var(--spacing-xl, 16px);
+        border: 1px solid var(--Colors-Border-border-primary, #d0d5dd);
+        background: var(--colors-Background-bg-primary, #fff);
+    }
+}
+
+/* Container grid layouts */
+.grid-container-12-columns {
+    display: flex;
+    height: 400px;
+    max-width: var(--container-max-width-desktop, 1280px);
+    padding: 130px 410px;
+    justify-content: center;
+    align-items: center;
+    align-self: stretch;
+    border-radius: var(--spacing-xl, 16px);
+    border: 1px solid var(--Colors-Border-border-primary, #d0d5dd);
+    background: var(--colors-Background-bg-primary, #fff);
+}
+
+.grid-container-6-columns {
+    display: flex;
+    width: var(--container-max-width-desktop, 1280px);
+    height: 400px;
+    max-width: var(--container-max-width-desktop, 1280px);
+    padding: 130px 422px;
+    justify-content: center;
+    align-items: center;
+    border-radius: var(--spacing-xl, 16px);
+    border: 1px solid var(--Colors-Border-border-primary, #d0d5dd);
+    background: var(--colors-Background-bg-primary, #fff);
+}
+
+.grid-container-5-columns {
+    display: flex;
+    height: 400px;
+    max-width: var(--container-max-width-desktop, 1280px);
+    padding: 130px 422.5px;
+    justify-content: center;
+    align-items: center;
+    align-self: stretch;
+    border-radius: var(--spacing-xl, 16px);
+    border: 1px solid var(--Colors-Border-border-primary, #d0d5dd);
+    background: var(--colors-Background-bg-primary, #fff);
+}
+
+.grid-container-3-columns {
+    display: flex;
+    height: 400px;
+    max-width: var(--container-max-width-desktop, 1280px);
+    padding: 130px 441.5px;
+    justify-content: center;
+    align-items: center;
+    align-self: stretch;
+    border-radius: var(--spacing-xl, 16px);
+    border: 1px solid var(--Colors-Border-border-primary, #d0d5dd);
+    background: var(--colors-Background-bg-primary, #fff);
+}
+
+.grid-container-2-columns {
+    display: flex;
+    height: 400px;
+    max-width: var(--container-max-width-desktop, 1280px);
+    padding: 130px 0;
+    justify-content: center;
+    align-items: center;
+    align-self: stretch;
+    border-radius: var(--spacing-xl, 16px);
+    border: 1px solid var(--Colors-Border-border-primary, #d0d5dd);
+    background: var(--colors-Background-bg-primary, #fff);
+}

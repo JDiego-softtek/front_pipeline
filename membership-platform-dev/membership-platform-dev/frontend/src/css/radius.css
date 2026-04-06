@@ -1,0 +1,20 @@
+/*
+    Use border radius values to quickly style the border-radius of an element.
+    Border radius values are useful for rounding edges of images, buttons, or
+    any other element. Just like pre-defined spacing values, working from a
+    defined border radius system allows you to work faster and more consistently.
+*/
+
+:root {
+/* Radius variables */
+--radius-none: 0rem;
+--radius-xxs: 0.125rem;
+--radius-xs: 0.25rem;
+--radius-sm: 0.375rem;
+--radius-md: 0.5rem;
+--radius-lg: 0.75rem;
+--radius-xl: 1rem;
+--radius-2xl: 1.25rem;
+--radius-3xl: 1.5rem;
+--radius-4xl: 9999px;
+}

@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json.schemastore.org/nest-cli",
+  "collection": "@nestjs/schematics",
+  "sourceRoot": "apps/membership-service/src",
+  "compilerOptions": {
+    "deleteOutDir": true,
+    "webpack": true,
+    "tsConfigPath": "apps/membership-service/tsconfig.app.json"
+  },
+  "monorepo": true,
+  "root": "apps/membership-service",
+  "projects": {
+    "database": {
+      "type": "library",
+      "root": "libs/database",
+      "entryFile": "index",
+      "sourceRoot": "libs/database/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/database/tsconfig.lib.json"
+      }
+    },
+    "membership-service": {
+      "type": "application",
+      "root": "apps/membership-service",
+      "entryFile": "main",
+      "sourceRoot": "apps/membership-service/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/membership-service/tsconfig.app.json"
+      }
+    },
+    "renewal-service": {
+      "type": "application",
+      "root": "apps/renewal-service",
+      "entryFile": "main",
+      "sourceRoot": "apps/renewal-service/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/renewal-service/tsconfig.app.json"
+      }
+    },
+    "signup-service": {
+      "type": "application",
+      "root": "apps/signup-service",
+      "entryFile": "main",
+      "sourceRoot": "apps/signup-service/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/signup-service/tsconfig.app.json"
+      }
+    },
+    "validations-service": {
+      "type": "application",
+      "root": "apps/validations-service",
+      "entryFile": "main",
+      "sourceRoot": "apps/validations-service/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/validations-service/tsconfig.app.json"
+      }
+    }
+  }
+}

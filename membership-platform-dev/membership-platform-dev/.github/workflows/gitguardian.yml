@@ -1,0 +1,50 @@
+name: GitGuardian Secret Scan
+
+on:
+  push:
+    branches: ["main", "develop", "feature/**"]
+  pull_request:
+    branches: ["main", "develop"]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  scanning:
+    name: GitGuardian Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # full history needed to scan all commits
+
+      - name: GitGuardian Scan
+        uses: GitGuardian/ggshield-action@v1
+        env:
+          GITHUB_PUSH_BEFORE_SHA: ${{ github.event.before }}
+          GITHUB_PUSH_BASE_SHA: ${{ github.event.base }}
+          GITHUB_DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+          GITGUARDIAN_API_KEY: ${{ secrets.GITGUARDIAN_API_KEY }}
+
+      - name: Post results as PR comment on failure
+        if: failure() && github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const body = `## 🔐 GitGuardian Scan — Secret Detected\n
+            > ⚠️ GitGuardian detected one or more secrets in this PR.\n
+            **Please review the [Actions log](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) for details.**\n
+            Common causes:
+            - Hardcoded API keys or tokens
+            - Private keys or certificates
+            - Database connection strings
+            - Cloud provider credentials (AWS, Azure, GCP)\n
+            **Do NOT merge until secrets are removed from the commit history.**`;
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body
+            });

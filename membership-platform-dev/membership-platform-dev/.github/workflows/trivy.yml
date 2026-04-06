@@ -1,0 +1,141 @@
+name: Trivy Security Scan
+
+on:
+  push:
+    branches: ["main", "develop", "feature/**"]
+    paths:
+      - 'backend/**'
+      - 'frontend/**'
+      - 'infra/**'
+      - 'data/**'
+      - '.github/workflows/trivy.yml'
+  pull_request:
+    branches: ["main", "develop"]
+    paths:
+      - 'backend/**'
+      - 'frontend/**'
+      - 'infra/**'
+      - 'data/**'
+      - '.github/workflows/trivy.yml'
+  schedule:
+    - cron: "0 9 * * 1"
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  trivy:
+    name: Trivy Scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # -------------------------------------------------------
+      # Detect which folders changed
+      # -------------------------------------------------------
+      - name: Get changed folders
+        id: changes
+        run: |
+          echo "backend=false"  >> $GITHUB_OUTPUT
+          echo "frontend=false" >> $GITHUB_OUTPUT
+          echo "infra=false"    >> $GITHUB_OUTPUT
+          echo "data=false"     >> $GITHUB_OUTPUT
+
+          git diff --name-only origin/${{ github.base_ref }}...HEAD 2>/dev/null | while read f; do
+            case "$f" in
+              backend/*)  echo "backend=true"  >> $GITHUB_OUTPUT ;;
+              frontend/*) echo "frontend=true" >> $GITHUB_OUTPUT ;;
+              infra/*)    echo "infra=true"    >> $GITHUB_OUTPUT ;;
+              data/*)     echo "data=true"     >> $GITHUB_OUTPUT ;;
+            esac
+          done || true
+
+      # -------------------------------------------------------
+      # 🏗️ Infra — IaC scan
+      # -------------------------------------------------------
+      - name: Trivy /infra
+        if: steps.changes.outputs.infra == 'true' || github.event_name == 'schedule'
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: config
+          scan-ref: ./infra
+          format: table
+          output: trivy-infra.txt
+          severity: CRITICAL,HIGH,MEDIUM
+          exit-code: 0
+
+      # -------------------------------------------------------
+      # ⚙️ Backend — Filesystem scan
+      # -------------------------------------------------------
+      - name: Trivy /backend
+        if: steps.changes.outputs.backend == 'true' || github.event_name == 'schedule'
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: fs
+          scan-ref: ./backend
+          format: table
+          output: trivy-backend.txt
+          severity: CRITICAL,HIGH,MEDIUM
+          exit-code: 0
+
+      # -------------------------------------------------------
+      # 🖥️ Frontend — Filesystem scan
+      # -------------------------------------------------------
+      - name: Trivy /frontend
+        if: steps.changes.outputs.frontend == 'true' || github.event_name == 'schedule'
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: fs
+          scan-ref: ./frontend
+          format: table
+          output: trivy-frontend.txt
+          severity: CRITICAL,HIGH,MEDIUM
+          exit-code: 0
+
+      # -------------------------------------------------------
+      # 📊 Data — Filesystem scan
+      # -------------------------------------------------------
+      - name: Trivy /data
+        if: steps.changes.outputs.data == 'true' || github.event_name == 'schedule'
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: fs
+          scan-ref: ./data
+          format: table
+          output: trivy-data.txt
+          severity: CRITICAL,HIGH,MEDIUM
+          exit-code: 0
+
+      # -------------------------------------------------------
+      # Post all results as a single PR comment
+      # -------------------------------------------------------
+      - name: Post results as PR comment
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const sections = [
+              { file: 'trivy-infra.txt',    label: '🏗️ /infra'    },
+              { file: 'trivy-backend.txt',  label: '⚙️ /backend'  },
+              { file: 'trivy-frontend.txt', label: '🖥️ /frontend' },
+              { file: 'trivy-data.txt',     label: '📊 /data'     },
+            ];
+            const body = sections
+              .filter(s => fs.existsSync(s.file))
+              .map(s => {
+                const out = fs.readFileSync(s.file, 'utf8').trim();
+                return `## ${s.label}\n\`\`\`\n${out || '✅ No issues found.'}\n\`\`\``;
+              })
+              .join('\n\n');
+            if (body) {
+              github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: `# 🔍 Trivy Security Scan Results\n\n${body}`
+              });
+            }

@@ -1,0 +1,492 @@
+# =============================================================================
+# infra-platform.yml
+#
+# INFRASTRUCTURE DEPLOYMENT — FOUNDATIONAL STACKS
+# ────────────────────────────────────────────────
+# Owned by: Platform/Foundational Engineering Team
+#
+# Scope: Layer 0 (_shared) and Layer 1 (network, security, identities, 
+#        observability) stacks ONLY.
+#
+# Targets: foundations, network, security, identities, observability, 
+#          shared, full
+#
+# This workflow enforces strict access control, preventing developers from
+# triggering foundation deployments. Targets are validated to reject any
+# consumer stacks (app, rbac).
+#
+# Authentication: ARM credentials (client secret) via GitHub Environment secrets
+#
+# Concurrency: One deployment per environment (serialized)
+#
+# Environment Protection: Stricter reviewer gates for staging/prod
+# =============================================================================
+
+name: Infra Deploy — Platform (Foundations)
+
+on:
+  # ---------------------------------------------------------------------------
+  # PRIMARY TRIGGER: Manual dispatch via GitHub Actions UI.
+  # Platform engineers select target, action, and environment.
+  # ---------------------------------------------------------------------------
+  workflow_dispatch:
+    inputs:
+      target:
+        description: |
+          Deployment target (foundations only).
+          • full         → all stacks including app/rbac (validation will reject this)
+          • foundations  → network, security, identities, observability
+          • network      → network stack only
+          • security     → security stack only
+          • identities   → identities stack only
+          • observability → observability stack only
+          • shared       → shared configuration only
+        required: true
+        default: "foundations"
+        type: choice
+        options:
+          - full
+          - foundations
+          - network
+          - security
+          - identities
+          - observability
+          - shared
+
+      action:
+        description: "Terraform action to perform."
+        required: true
+        default: "plan"
+        type: choice
+        options:
+          - plan
+          - apply
+
+      environment:
+        description: "Target environment."
+        required: true
+        default: "dev"
+        type: choice
+        options:
+          - dev
+          - staging
+          - prod
+
+  # ---------------------------------------------------------------------------
+  # SECONDARY TRIGGER: Push to the dedicated 'workflow-test' branch.
+  # Purpose: allows testing this workflow file without going through the
+  # workflow_dispatch UI. Only fires when this specific workflow file changes.
+  # Runs with safe defaults: target=foundations, action=plan, environment=dev.
+  # DO NOT use this branch for production deployments.
+  # ---------------------------------------------------------------------------
+  push:
+    branches:
+      - workflow-test
+    paths:
+      - .github/workflows/infra-platform.yml
+
+# ---------------------------------------------------------------------------
+# Concurrency: One foundation deployment per environment.
+# Do NOT cancel an in-progress apply.
+# ---------------------------------------------------------------------------
+concurrency:
+  group: infra-platform-${{ inputs.environment || 'dev' }}
+  cancel-in-progress: false
+
+env:
+  TF_VERSION: "1.7.5"
+
+# ---------------------------------------------------------------------------
+# Permissions: Minimal required for checkout and actions
+# ---------------------------------------------------------------------------
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+
+  # ─────────────────────────────────────────────────────────────────────────
+  # JOB 1 — RESOLVE AND VALIDATE STACKS
+  # Determines the ordered list of stacks for the given target.
+  # VALIDATES that no consumer stacks (app, rbac) are present.
+  # ─────────────────────────────────────────────────────────────────────────
+  resolve-stacks:
+    name: "Resolve stacks for target: ${{ inputs.target || 'foundations' }}"
+    runs-on: ubuntu-latest
+    outputs:
+      stacks_json: ${{ steps.resolve.outputs.stacks_json }}
+      stacks_count: ${{ steps.resolve.outputs.stacks_count }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Make scripts executable
+        run: chmod +x infra/scripts/*.sh
+
+      - name: Resolve stack list
+        id: resolve
+        run: |
+          # When triggered by push (workflow-test branch), inputs are not set.
+          # Fall back to safe defaults: target=foundations, action=plan, env=dev.
+          STACKS_JSON=$(infra/scripts/resolve-stacks.sh \
+            --target "${{ inputs.target || 'foundations' }}" \
+            --env    "${{ inputs.environment || 'dev' }}" \
+            --format json)
+
+          echo "stacks_json=${STACKS_JSON}" >> "$GITHUB_OUTPUT"
+
+          COUNT=$(echo "$STACKS_JSON" | python3 -c "import sys,json; print(len(json.load(sys.stdin)))")
+          echo "stacks_count=${COUNT}" >> "$GITHUB_OUTPUT"
+
+          echo "### 📋 Resolved Stacks (Platform Pipeline)" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "| # | Stack Path |" >> "$GITHUB_STEP_SUMMARY"
+          echo "|---|-----------|" >> "$GITHUB_STEP_SUMMARY"
+          echo "$STACKS_JSON" | python3 -c "
+          import sys, json
+          stacks = json.load(sys.stdin)
+          for i, s in enumerate(stacks, 1):
+              print(f'| {i} | \`{s}\` |')
+          " >> "$GITHUB_STEP_SUMMARY"
+
+          echo "**Target:** \`${{ inputs.target || 'foundations' }}\`  " >> "$GITHUB_STEP_SUMMARY"
+          echo "**Action:** \`${{ inputs.action || 'plan' }}\`  " >> "$GITHUB_STEP_SUMMARY"
+          echo "**Environment:** \`${{ inputs.environment || 'dev' }}\`" >> "$GITHUB_STEP_SUMMARY"
+          if [ "${{ github.event_name }}" = "push" ]; then
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "> ⚠️ **Push-triggered run** (branch: \`${{ github.ref_name }}\`). Using defaults: target=foundations, action=plan, environment=dev." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Validate no consumer stacks
+        run: |
+          STACKS_JSON='${{ steps.resolve.outputs.stacks_json }}'
+
+          # Check if app or rbac appear in the resolved stacks
+          HAS_APP=$(echo "$STACKS_JSON" | grep -c '/app' || true)
+          HAS_RBAC=$(echo "$STACKS_JSON" | grep -c '/rbac' || true)
+
+          if [ "$HAS_APP" -gt 0 ] || [ "$HAS_RBAC" -gt 0 ]; then
+            echo "::error::Consumer stacks (app, rbac) are not allowed in infra-platform.yml"
+            echo "::error::This workflow is for foundational stacks only (network, security, identities, observability, shared)."
+            echo "::error::Use infra-app.yml to deploy app/rbac stacks."
+            exit 1
+          fi
+
+          echo "✅ Validation passed: All resolved stacks are foundational (Layer 0/1)"
+
+  # ─────────────────────────────────────────────────────────────────────────
+  # JOB 2 — TERRAFORM EXECUTE
+  # Iterates the resolved stack list sequentially.
+  # Per stack: terraform init → plan → (apply if action=apply)
+  # ─────────────────────────────────────────────────────────────────────────
+  terraform-execute:
+    name: "Terraform ${{ inputs.action || 'plan' }} — ${{ inputs.environment || 'dev' }} (Platforms)"
+    runs-on: ubuntu-latest
+    needs: resolve-stacks
+
+    # GitHub Environment provides:
+    #   • Required reviewer gates (configured in repo Settings → Environments)
+    #   • Environment-scoped secrets and variables
+    #     - ARM_CLIENT_ID
+    #     - ARM_TENANT_ID
+    #     - ARM_SUBSCRIPTION_ID
+    #     - ARM_CLIENT_SECRET
+    #     - TF_BACKEND_RG
+    #     - TF_BACKEND_STORAGE_ACCOUNT
+    #     - TF_BACKEND_CONTAINER
+    environment: ${{ inputs.environment || 'dev' }}-platform
+
+    env:
+      ARM_CLIENT_ID:          ${{ vars.AZURE_CLIENT_ID }}
+      ARM_TENANT_ID:          ${{ vars.AZURE_TENANT_ID }}
+      ARM_SUBSCRIPTION_ID:    ${{ vars.AZURE_SUBSCRIPTION_ID }}
+      ARM_CLIENT_SECRET:      ${{ secrets.AZURE_CLIENT_SECRET }}
+      TF_VAR_subscription_id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+      TF_BACKEND_RG:               ${{ vars.TF_BACKEND_RG }}
+      TF_BACKEND_STORAGE_ACCOUNT:  ${{ vars.TF_BACKEND_STORAGE_ACCOUNT }}
+      TF_BACKEND_CONTAINER:        ${{ vars.TF_BACKEND_CONTAINER }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+
+      - name: Azure Login (Service Principal)
+        uses: azure/login@v2
+        with:
+          creds: |
+            {
+              "clientId": "${{ env.ARM_CLIENT_ID }}",
+              "clientSecret": "${{ env.ARM_CLIENT_SECRET }}",
+              "subscriptionId": "${{ env.ARM_SUBSCRIPTION_ID }}",
+              "tenantId": "${{ env.ARM_TENANT_ID }}"
+            }
+
+      # -----------------------------------------------------------------------
+      # Write a temporary backend partial config override file.
+      # This avoids passing secrets on the CLI and works with -backend-config.
+      # -----------------------------------------------------------------------
+      - name: Write backend config override
+        run: |
+          cat > /tmp/backend-override.hcl <<EOF
+          resource_group_name  = "${TF_BACKEND_RG}"
+          storage_account_name = "${TF_BACKEND_STORAGE_ACCOUNT}"
+          container_name       = "${TF_BACKEND_CONTAINER}"
+          EOF
+
+      # -----------------------------------------------------------------------
+      # Write a minimal shared auto.tfvars for common runtime values.
+      # Foundation stacks do NOT declare backend_* variables (they have no
+      # terraform_remote_state consumers), so only environment is written here.
+      # All other common values (project, location, owner, etc.) come from
+      # _shared/common.tfvars, passed via -var-file in the execution loop.
+      # -----------------------------------------------------------------------
+      - name: Write shared tfvars
+        run: |
+          cat > /tmp/shared-backend.auto.tfvars <<EOF
+          environment = "${{ inputs.environment || 'dev' }}"
+          EOF
+
+      # -----------------------------------------------------------------------
+      # Main execution loop — iterate stacks sequentially.
+      # -----------------------------------------------------------------------
+      - name: Execute Terraform stacks
+        id: tf-execute
+        run: |
+          set -euo pipefail
+
+          STACKS_JSON='${{ needs.resolve-stacks.outputs.stacks_json }}'
+          ACTION="${{ inputs.action || 'plan' }}"
+          ENV="${{ inputs.environment || 'dev' }}"
+          PLAN_DIR="${GITHUB_WORKSPACE}/plan-artifacts"
+          mkdir -p "$PLAN_DIR"
+
+          # ── Plan Summaries section header ──────────────────────────────────
+          # This heading visually groups all per-stack plan detail blocks that
+          # are appended inside the loop below (one block per stack).
+          # It is written once, before the loop starts.
+          echo "### 📊 Terraform Plan Summaries" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "*Per-stack resource change breakdown — generated from \`terraform show -json\`*" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+
+          # Start summary table
+          echo "### 🏗️ Terraform Execution Results" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Stack | Init | Plan | Apply | Status |" >> "$GITHUB_STEP_SUMMARY"
+          echo "|-------|------|------|-------|--------|" >> "$GITHUB_STEP_SUMMARY"
+
+          mapfile -t STACKS < <(echo "$STACKS_JSON" | python3 -c "
+          import sys, json
+          for s in json.load(sys.stdin):
+              print(s)
+          ")
+
+          OVERALL_STATUS=0
+
+          for STACK_PATH in "${STACKS[@]}"; do
+            STACK_NAME=$(basename "$STACK_PATH")
+            ABS_STACK="${GITHUB_WORKSPACE}/${STACK_PATH}"
+            PLAN_FILE="${PLAN_DIR}/${STACK_NAME}.tfplan"
+
+            echo ""
+            echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+            echo "  STACK: ${STACK_NAME}  (${STACK_PATH})"
+            echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+            INIT_STATUS="✅"
+            PLAN_STATUS="✅"
+            APPLY_STATUS="⏭️"
+            ROW_STATUS="✅ ok"
+
+            # ----------------------------------------------------------------
+            # Copy shared tfvars into stack directory
+            # ----------------------------------------------------------------
+            cp /tmp/shared-backend.auto.tfvars "${ABS_STACK}/shared-backend.auto.tfvars"
+
+            # ----------------------------------------------------------------
+            # terraform init
+            # ----------------------------------------------------------------
+            echo "→ terraform init"
+            if ! terraform -chdir="${ABS_STACK}" init \
+              -backend-config=/tmp/backend-override.hcl \
+              -backend-config="${GITHUB_WORKSPACE}/infra/envs/${ENV}/backend.hcl" \
+              -input=false \
+              -no-color; then
+              INIT_STATUS="❌"
+              ROW_STATUS="❌ init failed"
+              OVERALL_STATUS=1
+              echo "| \`${STACK_NAME}\` | ${INIT_STATUS} | — | — | ${ROW_STATUS} |" >> "$GITHUB_STEP_SUMMARY"
+              echo "ERROR: terraform init failed for stack: ${STACK_NAME}" >&2
+              rm -f "${ABS_STACK}/shared-backend.auto.tfvars"
+              continue
+            fi
+
+            # ----------------------------------------------------------------
+            # terraform plan
+            # ----------------------------------------------------------------
+            echo "→ terraform plan"
+            COMMON_TFVARS="${GITHUB_WORKSPACE}/infra/envs/${ENV}/_shared/common.tfvars"
+            TFVARS_ARG=""
+            if [[ -f "$COMMON_TFVARS" ]]; then
+              TFVARS_ARG="-var-file=${COMMON_TFVARS}"
+            fi
+            if [[ -f "${ABS_STACK}/${ENV}.tfvars" ]]; then
+              TFVARS_ARG="${TFVARS_ARG} -var-file=${ABS_STACK}/${ENV}.tfvars"
+            fi
+
+            if ! terraform -chdir="${ABS_STACK}" plan \
+              ${TFVARS_ARG} \
+              -out="${PLAN_FILE}" \
+              -input=false \
+              -no-color; then
+              PLAN_STATUS="❌"
+              ROW_STATUS="❌ plan failed"
+              OVERALL_STATUS=1
+              echo "| \`${STACK_NAME}\` | ${INIT_STATUS} | ${PLAN_STATUS} | — | ${ROW_STATUS} |" >> "$GITHUB_STEP_SUMMARY"
+              echo "ERROR: terraform plan failed for stack: ${STACK_NAME}" >&2
+              rm -f "${ABS_STACK}/shared-backend.auto.tfvars"
+              continue
+            fi
+
+            # ----------------------------------------------------------------
+            # Parse the binary plan as JSON and write a per-stack plan summary
+            # to the GitHub Actions Job Summary ($GITHUB_STEP_SUMMARY).
+            #
+            # `terraform show -json` converts the binary plan file produced by
+            # `terraform plan -out` into a machine-readable JSON structure.
+            # NOTE: -no-color must NOT be used here — the output is JSON, not
+            #       human text. stderr is intentionally left unredirected so
+            #       Terraform's native diagnostics appear in the log.
+            # ----------------------------------------------------------------
+            echo "→ terraform show -json (parsing plan for summary)"
+            PLAN_JSON=$(terraform -chdir="${ABS_STACK}" show -json "${PLAN_FILE}" 2>&1) || {
+              echo "::warning::terraform show -json failed for stack '${STACK_NAME}' — skipping plan summary." >&2
+              PLAN_JSON="{}"
+            }
+
+            # ── Extract change counts from the parsed JSON ──────────────────
+            # .resource_changes[] contains one entry per resource tracked in
+            # the plan. change.actions is an array such as ["create"],
+            # ["update"], ["delete"], or ["no-op"].
+            # We use `// []` as a null-safety fallback in case the field is
+            # absent (e.g., no resources at all in this stack).
+
+            # Count resources whose action array contains "create"
+            COUNT_ADD=$(echo "$PLAN_JSON" | jq '[.resource_changes // [] | .[] | select(.change.actions | contains(["create"]))] | length' 2>/dev/null || true)
+            COUNT_ADD=${COUNT_ADD:-0}
+
+            # Count resources whose action array contains "update"
+            COUNT_CHANGE=$(echo "$PLAN_JSON" | jq '[.resource_changes // [] | .[] | select(.change.actions | contains(["update"]))] | length' 2>/dev/null || true)
+            COUNT_CHANGE=${COUNT_CHANGE:-0}
+
+            # Count resources whose action array contains "delete"
+            COUNT_DESTROY=$(echo "$PLAN_JSON" | jq '[.resource_changes // [] | .[] | select(.change.actions | contains(["delete"]))] | length' 2>/dev/null || true)
+            COUNT_DESTROY=${COUNT_DESTROY:-0}
+
+            # Build a newline-separated list of "type.name" for every resource
+            # that has ANY action other than "no-op" (i.e., something changes).
+            CHANGED_RESOURCES=$(echo "$PLAN_JSON" | jq -r '
+              .resource_changes // []
+              | .[]
+              | select(.change.actions != ["no-op"])
+              | "\(.type).\(.name)"
+            ' 2>/dev/null || true)
+
+            # ── Write per-stack plan detail block to Job Summary ────────────
+            # This block is appended BEFORE the execution results table row
+            # for this stack, so the plan details appear grouped under the
+            # "📊 Terraform Plan Summaries" heading written above the loop.
+            {
+              # Level-4 heading identifies the stack and its path
+              echo "#### 📦 Stack: \`${STACK_NAME}\` (\`${STACK_PATH}\`)"
+              echo ""
+              echo "**Environment:** \`${ENV}\`"
+              echo ""
+
+              # Change count table — mirrors `terraform plan` output summary
+              echo "| Action     | Count |"
+              echo "|------------|-------|"
+              echo "| ➕ Add     | ${COUNT_ADD} |"
+              echo "| 🔄 Change  | ${COUNT_CHANGE} |"
+              echo "| 🗑️ Destroy | ${COUNT_DESTROY} |"
+              echo ""
+
+              # Collapsible list of affected resources — expand to see details
+              echo "<details>"
+              echo "<summary>Affected resources (click to expand)</summary>"
+              echo ""
+              if [[ -z "$CHANGED_RESOURCES" ]]; then
+                echo "No resource changes detected."
+              else
+                while IFS= read -r res; do
+                  echo "- \`${res}\`"
+                done <<< "$CHANGED_RESOURCES"
+              fi
+              echo ""
+              echo "</details>"
+              echo ""
+            } >> "$GITHUB_STEP_SUMMARY"
+
+            # ----------------------------------------------------------------
+            # terraform apply (only when action=apply)
+            # ----------------------------------------------------------------
+            if [[ "$ACTION" == "apply" ]]; then
+              echo "→ terraform apply"
+              if ! terraform -chdir="${ABS_STACK}" apply \
+                -input=false \
+                -no-color \
+                "${PLAN_FILE}"; then
+                APPLY_STATUS="❌"
+                ROW_STATUS="❌ apply failed"
+                OVERALL_STATUS=1
+                echo "ERROR: terraform apply failed for stack: ${STACK_NAME}" >&2
+              else
+                APPLY_STATUS="✅"
+                ROW_STATUS="✅ applied"
+              fi
+            fi
+
+            echo "| \`${STACK_NAME}\` | ${INIT_STATUS} | ${PLAN_STATUS} | ${APPLY_STATUS} | ${ROW_STATUS} |" >> "$GITHUB_STEP_SUMMARY"
+            rm -f "${ABS_STACK}/shared-backend.auto.tfvars"
+          done
+
+          if [[ $OVERALL_STATUS -ne 0 ]]; then
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "> ❌ One or more stacks failed. Review the logs above." >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          else
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "> ✅ All stacks completed successfully." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      # -----------------------------------------------------------------------
+      # Upload plan artifacts for audit trail and manual review.
+      # Retained for 30 days; downloadable from the Actions run page.
+      # -----------------------------------------------------------------------
+      - name: Upload plan artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: "tfplans-platform-${{ inputs.environment || 'dev' }}-${{ inputs.target || 'foundations' }}-${{ github.run_id }}"
+          path: plan-artifacts/
+          retention-days: 30
+          if-no-files-found: ignore
+
+      # -----------------------------------------------------------------------
+      # Final job summary footer
+      # -----------------------------------------------------------------------
+      - name: Write summary footer
+        if: always()
+        run: |
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "---" >> "$GITHUB_STEP_SUMMARY"
+          echo "**Run ID:** \`${{ github.run_id }}\`  " >> "$GITHUB_STEP_SUMMARY"
+          echo "**Triggered by:** \`${{ github.actor }}\`  " >> "$GITHUB_STEP_SUMMARY"
+          echo "**Commit:** \`${{ github.sha }}\`  " >> "$GITHUB_STEP_SUMMARY"
+          echo "**Ref:** \`${{ github.ref_name }}\`" >> "$GITHUB_STEP_SUMMARY"

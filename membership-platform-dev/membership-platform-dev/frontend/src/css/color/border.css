@@ -1,0 +1,29 @@
+/* 
+    Color variables (Figma’s version of design tokens) store reusable values that can be 
+    applied to all kinds of design properties including fill and stroke colors. They help 
+    save time and effort when managing design systems by acting as a “single source of 
+    truth” while allowing designers to create multiple color modes.
+
+    Border color: Use border color variables to manage all stroke colors in your designs
+    across light and dark modes.
+*/
+
+/** Border color **/
+:root {
+    /* Border primary/secondary/tertiary */
+    --color-border-primary: var(--color-gray-300);
+    --color-border-secondary: var(--color-gray-200);
+    --color-border-tertiary: var(--color-gray-100);
+
+    /* Border disabled */
+    --color-border-disabled: var(--color-gray-300);
+    --color-border-disabled_subtle: var(--color-gray-200);
+
+    /* Border brand */
+    --color-border-brand: var(--color-brand-primary-500);
+    --color-border-brand_alt: var(--color-brand-primary-600);
+
+    /* Border error */
+    --color-border-error: var(--color-error-500);
+    --color-border-error-subtle: var(--color-error-300);
+}

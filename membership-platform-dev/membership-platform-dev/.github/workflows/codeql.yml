@@ -1,0 +1,194 @@
+name: CodeQL Security Scan
+
+# -------------------------------------------------------
+# 🚧 Disabled until folders contain real TS/JS source code
+# To re-enable: change "false" to the original trigger below
+# -------------------------------------------------------
+on:
+  workflow_dispatch  # manual trigger only — run it on demand when ready
+
+# on:
+#   push:
+#     branches: ["main", "develop", "feature/**"]
+#   pull_request:
+#     branches: ["main", "develop"]
+#   schedule:
+#     - cron: "0 8 * * 1"
+
+permissions:
+  contents: read
+  pull-requests: write
+  actions: read
+
+jobs:
+
+  codeql-backend:
+    name: CodeQL /backend
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v4
+        with:
+          languages: javascript-typescript
+          queries: security-extended
+
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v4
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v4
+        with:
+          category: codeql-backend
+          output: codeql-backend-results
+          upload: never
+
+      - name: Post /backend results as PR comment
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const path = 'codeql-backend-results';
+            let output = '✅ No issues found.';
+            if (fs.existsSync(path)) {
+              const files = fs.readdirSync(path);
+              const sarif = files.find(f => f.endsWith('.sarif'));
+              if (sarif) {
+                const data = JSON.parse(fs.readFileSync(`${path}/${sarif}`, 'utf8'));
+                const results = data.runs?.[0]?.results || [];
+                if (results.length > 0) {
+                  output = results.map(r => {
+                    const rule = r.ruleId || 'unknown';
+                    const msg = r.message?.text || '';
+                    const loc = r.locations?.[0]?.physicalLocation;
+                    const file = loc?.artifactLocation?.uri || '';
+                    const line = loc?.region?.startLine || '';
+                    return `⚠️ [${rule}] ${msg}\n   → ${file}:${line}`;
+                  }).join('\n\n');
+                }
+              }
+            }
+            const body = `## ⚙️ CodeQL Scan — \`/backend\`\n\`\`\`\n${output}\n\`\`\``;
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body
+            });
+
+  codeql-frontend:
+    name: CodeQL /frontend
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v4
+        with:
+          languages: javascript-typescript
+          queries: security-extended
+
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v4
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v4
+        with:
+          category: codeql-frontend
+          output: codeql-frontend-results
+          upload: never
+
+      - name: Post /frontend results as PR comment
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const path = 'codeql-frontend-results';
+            let output = '✅ No issues found.';
+            if (fs.existsSync(path)) {
+              const files = fs.readdirSync(path);
+              const sarif = files.find(f => f.endsWith('.sarif'));
+              if (sarif) {
+                const data = JSON.parse(fs.readFileSync(`${path}/${sarif}`, 'utf8'));
+                const results = data.runs?.[0]?.results || [];
+                if (results.length > 0) {
+                  output = results.map(r => {
+                    const rule = r.ruleId || 'unknown';
+                    const msg = r.message?.text || '';
+                    const loc = r.locations?.[0]?.physicalLocation;
+                    const file = loc?.artifactLocation?.uri || '';
+                    const line = loc?.region?.startLine || '';
+                    return `⚠️ [${rule}] ${msg}\n   → ${file}:${line}`;
+                  }).join('\n\n');
+                }
+              }
+            }
+            const body = `## 🖥️ CodeQL Scan — \`/frontend\`\n\`\`\`\n${output}\n\`\`\``;
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body
+            });
+
+  codeql-data:
+    name: CodeQL /data
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v4
+        with:
+          languages: javascript-typescript
+          queries: security-extended
+
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v4
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v4
+        with:
+          category: codeql-data
+          output: codeql-data-results
+          upload: never
+
+      - name: Post /data results as PR comment
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const path = 'codeql-data-results';
+            let output = '✅ No issues found.';
+            if (fs.existsSync(path)) {
+              const files = fs.readdirSync(path);
+              const sarif = files.find(f => f.endsWith('.sarif'));
+              if (sarif) {
+                const data = JSON.parse(fs.readFileSync(`${path}/${sarif}`, 'utf8'));
+                const results = data.runs?.[0]?.results || [];
+                if (results.length > 0) {
+                  output = results.map(r => {
+                    const rule = r.ruleId || 'unknown';
+                    const msg = r.message?.text || '';
+                    const loc = r.locations?.[0]?.physicalLocation;
+                    const file = loc?.artifactLocation?.uri || '';
+                    const line = loc?.region?.startLine || '';
+                    return `⚠️ [${rule}] ${msg}\n   → ${file}:${line}`;
+                  }).join('\n\n');
+                }
+              }
+            }
+            const body = `## 📊 CodeQL Scan — \`/data\`\n\`\`\`\n${output}\n\`\`\``;
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body
+            });

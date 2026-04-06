@@ -1,0 +1,128 @@
+/*
+    These are the main neutral, brand and semantic colors that make up the majority 
+    of the colors used in the design system and components.
+    
+    This system uses a three-tier architecture for color tokens:
+        a) Neutral: For backgrounds, borders, and text hierarchy (grays/whites/blacks).
+        b) Brand: The core identity colors (your primary and secondary brand hues).
+        c) Semantic: Colors that convey meaning (Success green, Warning orange, Error red).
+*/
+
+/* Base */
+:root {
+    --color-base-white: #ffffff;
+    --color-base-type-blue: #23376d;
+    --color-base-transparent: rgba(0, 0, 0, 0);
+}
+
+/* Brand primary */
+:root {
+    --color-brand-primary-25: #f8faff;
+    --color-brand-primary-50: #f0f5fe;
+    --color-brand-primary-100: #cfe4ff;
+    --color-brand-primary-200: #9fc9ff;
+    --color-brand-primary-300: #6faeff;
+    --color-brand-primary-400: #3f92ff;
+    --color-brand-primary-500: #2950ba;
+    --color-brand-primary-600: #23376d;
+    --color-brand-primary-700: #182958;
+    --color-brand-primary-800: #121f42;
+    --color-brand-primary-900: #0c152c;
+    --color-brand-primary-950: #060b16;
+}
+
+/* Brand secondary */
+:root {
+    --color-brand-secondary-25: #fff9f5;
+    --color-brand-secondary-50: #fff7ed;
+    --color-brand-secondary-100: #ffeed5;
+    --color-brand-secondary-200: #ffd6ae;
+    --color-brand-secondary-300: #ffc066;
+    --color-brand-secondary-400: #ff892e;
+    --color-brand-secondary-500: #f63d22;
+    --color-brand-secondary-600: #cc2c14;
+    --color-brand-secondary-700: #bc1b06;
+    --color-brand-secondary-800: #971b0c;
+    --color-brand-secondary-900: #771a0d;
+    --color-brand-secondary-950: #67130a;
+}
+
+/* Gray (light mode) */
+:root {
+    --color-gray-25: #fcfcfd;
+    --color-gray-50: #f9fafb;
+    --color-gray-100: #f2f4f7;
+    --color-gray-200: #e4e7ec;
+    --color-gray-300: #d0d5dd;
+    --color-gray-400: #98a2b3;
+    --color-gray-500: #667085;
+    --color-gray-600: #475467;
+    --color-gray-700: #33425c;
+    --color-gray-800: #2e4071;
+    --color-gray-900: #23376d;
+    --color-gray-950: #162446;
+}
+
+/* Gray (dark mode) */
+:root {
+    --color-gray-dark-25: #fafafa;
+    --color-gray-dark-50: #f5f5f6;
+    --color-gray-dark-100: #f0f1f1;
+    --color-gray-dark-200: #ececed;
+    --color-gray-dark-300: #cecfd2;
+    --color-gray-dark-400: #94969c;
+    --color-gray-dark-500: #85888e;
+    --color-gray-dark-600: #61646c;
+    --color-gray-dark-700: #333741;
+    --color-gray-dark-800: #1f242f;
+    --color-gray-dark-900: #161b26;
+    --color-gray-dark-950: #0c111d;
+}
+
+/* Error */
+:root {
+    --color-error-25: #fffbfa;
+    --color-error-50: #fef3f2;
+    --color-error-100: #fee4e2;
+    --color-error-200: #fecdca;
+    --color-error-300: #fda29b;
+    --color-error-400: #f97066;
+    --color-error-500: #f04438;
+    --color-error-600: #d92d20;
+    --color-error-700: #b42318;
+    --color-error-800: #912018;
+    --color-error-900: #7a271a;
+    --color-error-950: #55160c;
+}
+
+/* Warning */
+:root {
+    --color-warning-25: #fffcf5;
+    --color-warning-50: #fffaeb;
+    --color-warning-100: #fef0c7;
+    --color-warning-200: #fedf89;
+    --color-warning-300: #fec84b;
+    --color-warning-400: #fdb022;
+    --color-warning-500: #f79009;
+    --color-warning-600: #dc6803;
+    --color-warning-700: #b54708;
+    --color-warning-800: #93370d;
+    --color-warning-900: #7a2e0e;
+    --color-warning-950: #4e1d09;
+}
+
+/* Success */
+:root {
+    --color-success-25: #f6fff4;
+    --color-success-50: #e0fad7;
+    --color-success-100: #daf2ae;
+    --color-success-200: #c6ef7f;
+    --color-success-300: #9ad924;
+    --color-success-400: #7eb518;
+    --color-success-500: #71a216;
+    --color-success-600: #6c6b15;
+    --color-success-700: #609402;
+    --color-success-800: #517d01;
+    --color-success-900: #3f6001;
+    --color-success-950: #314b01;
+}

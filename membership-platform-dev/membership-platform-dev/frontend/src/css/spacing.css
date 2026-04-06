@@ -1,0 +1,79 @@
+/*
+    Just like your color scale, working from a defined spacing system allows you to work
+    faster and more consistently. Consistent and scalable spacing helps you eliminate
+    guesswork whilst designing and developing because you're designing with a limited
+    set of options.
+*/
+
+:root {
+  /* Primitive spacing tokens (base 4px scale) */
+  --spacing-0: 0rem;
+  --spacing-0-5: 0.125rem;
+  --spacing-1: 0.25rem;
+  --spacing-1-5: 0.375rem;
+  --spacing-2: 0.5rem;
+  --spacing-3: 0.75rem;
+  --spacing-4: 1rem;
+  --spacing-5: 1.25rem;
+  --spacing-6: 1.5rem;
+  --spacing-8: 2rem;
+  --spacing-10: 2.5rem;
+  --spacing-12: 3rem;
+  --spacing-16: 4rem;
+  --spacing-20: 5rem;
+  --spacing-24: 6rem;
+  --spacing-32: 8rem;
+  --spacing-40: 10rem;
+  --spacing-48: 12rem;
+  --spacing-56: 14rem;
+  --spacing-64: 16rem;
+  --spacing-80: 20rem;
+  --spacing-120: 30rem;
+  --spacing-140: 35rem;
+  --spacing-160: 40rem;
+  --spacing-180: 45rem;
+  --spacing-192: 48rem;
+  --spacing-256: 64rem;
+  --spacing-320: 80rem;
+  --spacing-360: 90rem;
+  --spacing-400: 100rem;
+  --spacing-480: 120rem;
+
+/* Spacing variables (semantic naming) */
+  --spacing-none: var(--spacing-0);
+  --spacing-xxs: var(--spacing-0-5);
+  --spacing-xs: var(--spacing-1);
+  --spacing-sm: var(--spacing-1-5);
+  --spacing-md: var(--spacing-2);
+  --spacing-lg: var(--spacing-3);
+  --spacing-xl: var(--spacing-4);
+  --spacing-2xl: var(--spacing-5);
+  --spacing-3xl: var(--spacing-6);
+  --spacing-4xl: var(--spacing-8);
+  --spacing-5xl: var(--spacing-10);
+  --spacing-6xl: var(--spacing-12);
+  --spacing-7xl: var(--spacing-16);
+  --spacing-8xl: var(--spacing-20);
+  --spacing-9xl: var(--spacing-24);
+
+/* Width variables */
+  --width-xxs: 20rem;
+  --width-xs: 24rem;
+  --width-sm: 30rem;
+  --width-md: 35rem;
+  --width-lg: 40rem;
+  --width-xl: 48rem;
+  --width-2xl: 64rem;
+  --width-3xl: 80rem;
+  --width-4xl: 90rem;
+  --width-5xl: 100rem;
+  --width-6xl: 120rem;
+
+/* Container variables (padding and max-widths) */
+  --container-padding-mobile: 1rem;
+  --container-padding-desktop: 2rem;
+  --container-max-width-desktop: 80rem;
+
+  /* Paragraph max-widths */
+  --paragraph-max-width: 45rem;
+}

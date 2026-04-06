@@ -1,0 +1,49 @@
+/* 
+    Color variables (Figma’s version of design tokens) store reusable values that can be 
+    applied to all kinds of design properties including fill and stroke colors. They help 
+    save time and effort when managing design systems by acting as a “single source of 
+    truth” while allowing designers to create multiple color modes.
+
+    Foreground color: Use foreground color variables to manage all non-text foreground 
+    elements in your designs across light and dark modes.
+
+*/
+
+/** Foreground color **/
+:root {
+    /* Foreground primary/secondary/tertiary/quaternary/quinary/senary */
+    --color-fg-primary: var(--color-gray-900);
+    --color-fg-secondary: var(--color-gray-700);
+    --color-fg-secondary_hover: var(--color-gray-800);
+    --color-fg-tertiary: var(--color-gray-600);
+    --color-fg-tertiary_hover: var(--color-gray-700);
+    --color-fg-quaternary: var(--color-gray-500);
+    --color-fg-quaternary_hover: var(--color-gray-600);
+    --color-fg-quinary: var(--color-gray-400);
+    --color-fg-quinary_hover: var(--color-gray-500);
+    --color-fg-senary: var(--color-gray-300);
+
+    /* Foreground white */
+    --color-fg-white: var(--color-base-white);
+
+    /* Foreground disabled */
+    --color-fg-disabled: var(--color-gray-400);
+    --color-fg-disabled_subtle: var(--color-gray-300);
+
+    /* Foreground brand */
+    --color-fg-brand-primary: var(--color-brand-primary-600);
+    --color-fg-brand-primary_alt: var(--color-brand-primary-600);
+    --color-fg-brand-secondary: var(--color-brand-primary-500);
+
+    /* Foreground error */
+    --color-fg-error-primary: var(--color-error-600);
+    --color-fg-error-secondary: var(--color-error-500);
+
+    /* Foreground warning */
+    --color-fg-warning-primary: var(--color-warning-600);
+    --color-fg-warning-secondary: var(--color-warning-500);
+
+    /* Foreground success */
+    --color-fg-success-primary: var(--color-success-600);
+    --color-fg-success-secondary: var(--color-success-500);
+}

@@ -1,0 +1,67 @@
+/* 
+    Color variables (Figma’s version of design tokens) store reusable values that can be 
+    applied to all kinds of design properties including fill and stroke colors. They help 
+    save time and effort when managing design systems by acting as a “single source of 
+    truth” while allowing designers to create multiple color modes.
+
+    Background color: Use background color variables to manage all background fill colors
+    in your designs across light and dark modes.
+*/
+
+/** Background color **/
+:root {
+    /* Background primary */
+    --color-bg-primary: var(--color-base-white);
+    --color-bg-primary_alt: var(--color-base-white);
+    --color-bg-primary_hover: var(--color-gray-50);
+    --color-bg-primary-solid: var(--color-gray-950);
+
+    /* Background secondary */
+    --color-bg-secondary: var(--color-gray-50);
+    --color-bg-secondary_alt: var(--color-gray-50);
+    --color-bg-secondary_hover: var(--color-gray-100);
+    --color-bg-secondary_subtle: var(--color-gray-25);
+    --color-bg-secondary_solid: var(--color-gray-600);
+
+    /* Background tertiary */
+    --color-bg-tertiary: var(--color-gray-100);
+
+    /* Background quaternary */
+    --color-bg-quaternary: var(--color-gray-200);
+
+    /* Background active */
+    --color-bg-active: var(--color-gray-50);
+
+    /* Background disabled */
+    --color-bg-disabled: var(--color-gray-100);
+    --color-bg-disabled_subtle: var(--color-gray-50);
+
+    /* Background overlay */
+    --color-bg-overlay: var(--color-gray-950);
+
+    /* Background brand */
+    --color-bg-brand-primary: var(--color-brand-primary-50);
+    --color-bg-brand-primary_alt: var(--color-brand-primary-50);
+    --color-bg-brand-secondary: var(--color-brand-primary-100);
+    --color-bg-brand-solid: var(--color-brand-primary-600);
+    --color-bg-brand-solid_hover: var(--color-brand-primary-700);
+
+    /* Background brand section */
+    --color-bg-brand-section: var(--color-brand-primary-800);
+    --color-bg-brand-section_subtle: var(--color-brand-primary-700);
+
+    /* Background error */
+    --color-bg-error-primary: var(--color-error-50);
+    --color-bg-error-secondary: var(--color-error-100);
+    --color-bg-error-solid: var(--color-error-600);
+
+    /* Background warning */
+    --color-bg-warning-primary: var(--color-warning-50);
+    --color-bg-warning-secondary: var(--color-warning-100);
+    --color-bg-warning-solid: var(--color-warning-600);
+
+    /* Background success */
+    --color-bg-success-primary: var(--color-success-50);
+    --color-bg-success-secondary: var(--color-success-100);
+    --color-bg-success-solid: var(--color-success-600);
+}

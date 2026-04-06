@@ -1,0 +1,51 @@
+/*
+  Focus rings identify the currently focused element on your page.
+*/
+
+/*
+  Focus rings identify the currently focused element on your page.
+*/
+
+/* Aliases (component tokens -> base tokens) */
+:root {
+    --colors-Background-bg-primary: var(--color-base-white, #ffffff);
+    --Colors-Border-border-primary: var(--color-gray-300, #d0d5dd);
+
+    --Colors-Effects-Focus-rings-focus-ring: var(--color-brand-primary-500, #2950ba);
+    --Colors-Effects-Focus-rings-focus-ring-error: var(--color-error-400, #f97066);
+}
+
+:root {
+    /* Inner ring */
+    --focus-ring-inner-color: var(--colors-Background-bg-primary, #fff);
+
+    /* Outer ring colors */
+    --focus-ring-brand-color: var(--Colors-Effects-Focus-rings-focus-ring, #2950ba);
+    --focus-ring-error-color: var(--Colors-Effects-Focus-rings-focus-ring-error, #f97066);
+
+    /* Sizes */
+    --focus-ring-inner-size: 2px;
+    --focus-ring-outer-size: 4px;
+}
+
+/* Focus rings (no base shadow) */
+:root {
+    --focus-ring-brand: 0 0 0 var(--focus-ring-inner-size) var(--focus-ring-inner-color), 0 0 0 var(--focus-ring-outer-size) var(--focus-ring-brand-color);
+
+    --focus-ring-error: 0 0 0 var(--focus-ring-inner-size) var(--focus-ring-inner-color), 0 0 0 var(--focus-ring-outer-size) var(--focus-ring-error-color);
+}
+
+/* Focus rings + shadows (composición) */
+:root {
+    /* Brand */
+    --focus-ring-shadow-xs: var(--shadow-xs), var(--focus-ring-brand);
+    --focus-ring-shadow-sm: var(--shadow-sm), var(--focus-ring-brand);
+
+    /* Error */
+    --focus-ring-error-shadow-xs: var(--shadow-xs), var(--focus-ring-error);
+
+    /* Skeuomorphic */
+    --focus-ring-shadow-xs-skeu: var(--shadow-skeu-inner-border), var(--shadow-skeu-inner), var(--shadow-xs), var(--focus-ring-brand);
+
+    --focus-ring-error-shadow-xs-skeu: var(--shadow-skeu-inner-border), var(--shadow-skeu-inner), var(--shadow-xs), var(--focus-ring-error);
+}

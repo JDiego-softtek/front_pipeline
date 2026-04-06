@@ -1,0 +1,39 @@
+# CODEOWNERS - membership-platform
+# Docs: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+#
+# Format: <pattern>  <@user or @org/team>
+# The last matching rule takes precedence.
+
+# -------------------------------------------------------
+# Default ownership
+# -------------------------------------------------------
+* @ddelgado-pricesmart @omartinez-pricesmart @guillermoquirartem
+# -------------------------------------------------------
+# Frontend
+# -------------------------------------------------------
+/frontend/ @csantiago-pricesmart @omartinez-pricesmart
+# -------------------------------------------------------
+# Backend
+# -------------------------------------------------------
+/backend/ @rnavarrete-pricesmart @omartinez-pricesmart
+# -------------------------------------------------------
+# Data platform
+# -------------------------------------------------------
+/data/ @MauValdovinos @omartinez-pricesmart
+# -------------------------------------------------------
+# Infrastructure (Terraform, Azure, etc.)
+# -------------------------------------------------------
+/infra/ @guillermoquirartem @jair-rojas-pricesmart @JorgeSalcedoPS @omartinez-pricesmart @JuanDValdivia
+# -------------------------------------------------------
+# CI/CD Workflows
+# -------------------------------------------------------
+/.github/workflows/ @guillermoquirartem @jair-rojas-pricesmart @moisesortizprice @omartinez-pricesmart @JuanDValdivia
+# -------------------------------------------------------
+# Repository configuration
+# -------------------------------------------------------
+/.github/ @guillermoquirartem @moisesortizprice @omartinez-pricesmart @JorgeSalcedoPS @jair-rojas-pricesmart
+# -------------------------------------------------------
+# Root-level files (optional but recommended)
+# -------------------------------------------------------
+/README.md  @guillermoquirartem @omartinez-pricesmart
+/.gitignore @guillermoquirartem @omartinez-pricesmart

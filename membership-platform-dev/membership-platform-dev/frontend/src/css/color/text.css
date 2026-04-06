@@ -1,0 +1,56 @@
+/* 
+    Color variables (Figma’s version of design tokens) store reusable values that can be 
+    applied to all kinds of design properties including fill and stroke colors. They help 
+    save time and effort when managing design systems by acting as a “single source of 
+    truth” while allowing designers to create multiple color modes.
+
+    Text color: Use text color variables to manage all text fill colors in your designs 
+    across light and dark modes. For more detail on how these variables are structured 
+    and how to use them, please refer to our Introduction to variables.
+*/
+
+/** Text color **/
+:root {
+    /* Text primary */
+    --color-text-primary: var(--color-gray-900);
+    --color-text-primary_on-brand: var(--color-base-white);
+
+    /* Text secondary */
+    --color-text-secondary: var(--color-gray-700);
+    --color-text-secondary_hover: var(--color-gray-800);
+    --color-text-secondary_on-brand: var(--color-primary-200);
+
+    /* Text tertiary */
+    --color-text-tertiary: var(--color-gray-600);
+    --color-text-tertiary_hover: var(--color-gray-700);
+    --color-text-tertiary_on-brand: var(--color-primary-200);
+
+    /* Text quaternary */
+    --color-text-quaternary: var(--color-gray-500);
+    --color-text-quaternary_on-brand: var(--color-primary-300);
+
+    /* Text white */
+    --text-white: var(--color-base-white);
+
+    /* Text disabled */
+    --text-disabled: var(--color-gray-500);
+
+    /* Text placeholder */
+    --text-placeholder: var(--color-gray-500);
+    --text-placeholder_subtle: var(--color-gray-300);
+
+    /* Text brand */
+    --text-brand-primary: var(--color-brand-primary-900);
+    --text-brand-secondary: var(--color-brand-primary-700);
+    --text-brand-tertiary: var(--color-brand-primary-600);
+    --text-brand-tertiary_alt: var(--color-brand-primary-600);
+
+    /* Text error */
+    --text-error-primary: var(--color-error-600);
+
+    /* Text warning */
+    --text-warning-primary: var(--color-warning-600);
+
+    /* Text success */
+    --text-success-primary: var(--color-success-600);
+}
