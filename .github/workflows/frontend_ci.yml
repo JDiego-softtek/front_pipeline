@@ -72,10 +72,10 @@ jobs:
         uses: aquasecurity/trivy-action@master
         with:
           image-ref: ${{ env.IMAGE_NAME }}:${{ github.sha }}
-          format: table
+         # format: table
           exit-code: '1'
-          ignore-unfixed: true
-          vuln-type: os,library
+         # ignore-unfixed: true
+         # vuln-type: os,library
           severity: CRITICAL,HIGH
 
 #      - name: Push Docker image to ACR
