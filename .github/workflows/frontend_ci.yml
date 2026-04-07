@@ -62,7 +62,7 @@ jobs:
         run: |
           docker build \
             -t myapp:${{ github.sha }} \
-            membership-platform-dev/frontend
+            membership-platform-dev/membership-platform-dev/frontend
           #  -t ${{ secrets.ACR_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:${{ github.sha }} \
           #  -t ${{ secrets.ACR_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:pr-${{ github.event.pull_request.number }} \
           #  -f Dockerfile \
