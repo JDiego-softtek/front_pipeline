@@ -61,10 +61,11 @@ jobs:
       - name: Build Docker image
         run: |
           docker build \
-            -t ${{ secrets.ACR_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:${{ github.sha }} \
-            -t ${{ secrets.ACR_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:pr-${{ github.event.pull_request.number }} \
-            -f Dockerfile \
-            .
+            -t myapp:${{ github.sha }} .
+          #  -t ${{ secrets.ACR_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:${{ github.sha }} \
+          #  -t ${{ secrets.ACR_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:pr-${{ github.event.pull_request.number }} \
+          #  -f Dockerfile \
+          #  .
 
       - name: Scan Docker image with Trivy
         uses: aquasecurity/trivy-action@master
