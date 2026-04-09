@@ -43,7 +43,7 @@ jobs:
           app_location: "membership-platform-dev/membership-platform-dev/frontend"
           # api_location: ""
           output_location: "out"
-          app_build_command: "npx next build && npx next export"  #-> Fuerza el build de Next.js en modo estático
+          # app_build_command: "npx next build && npx next export"  #->  Fuerza el build de Next.js en modo estático (no funcionó)
 
   # close_pull_request_job:
   #   if: github.event_name == 'pull_request' && github.event.action == 'closed'
