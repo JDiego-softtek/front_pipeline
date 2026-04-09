@@ -1,0 +1,55 @@
+name: swa_mot
+
+on:
+  workflow_dispatch:
+
+jobs:
+  ci:
+    name: Build frontend for SWA
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        working-directory: membership-platform-dev/membership-platform-dev/frontend
+        run: npm ci
+
+      - name: Security audit
+        working-directory: membership-platform-dev/membership-platform-dev/frontend
+        run: npm audit --audit-level=critical
+
+      - name: Run linter
+        working-directory: membership-platform-dev/membership-platform-dev/frontend
+        run: npm run lint
+
+      - name: Build frontend
+        working-directory: membership-platform-dev/membership-platform-dev/frontend
+        run: npm run build
+
+      # ---------- TODO ESTO NO APLICA PARA STATIC WEB APP ----------
+      # ------al darle az staticwebapp create --login-with-github ... se debio crear otro workflow: .github/workflows/azure-static-web-apps-*.yml
+
+      
+      # - name: Authenticate with Azure
+      #   uses: azure/login@v2
+      #   with:
+      #     creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      # - name: Build Docker image
+      #   run: docker build ...
+
+      # - name: Scan Docker image with Trivy
+      #   uses: aquasecurity/trivy-action@master
+
+      # - name: Log in to Azure Container Registry
+      #   run: az acr login ...
+
+      # - name: Tag and push Docker image to ACR
+      #   run: docker push ...
