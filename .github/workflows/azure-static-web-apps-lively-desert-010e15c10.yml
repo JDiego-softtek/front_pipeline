@@ -14,11 +14,11 @@ jobs:
   build_and_deploy_job:
     # if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
     runs-on: ubuntu-latest
-
+   
     
     env:
       ORYX_NODE_VERSION: 20   # -> Azure Static Web Apps usa Oryx para build, y Oryx NO soporta node 24.12
-
+      NODE_VERSION: 20        #->try
     
     name: Build and Deploy Job
     steps:
