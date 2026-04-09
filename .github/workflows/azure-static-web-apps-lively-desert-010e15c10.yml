@@ -17,7 +17,7 @@ jobs:
 
     
     env:
-      ORYX_NODE_VERSION: 2   # -> Azure Static Web Apps usa Oryx para build, y Oryx NO soporta node 24.12
+      ORYX_NODE_VERSION: 20   # -> Azure Static Web Apps usa Oryx para build, y Oryx NO soporta node 24.12
 
     
     name: Build and Deploy Job
