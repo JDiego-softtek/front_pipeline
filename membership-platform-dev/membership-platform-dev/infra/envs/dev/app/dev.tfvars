@@ -173,3 +173,18 @@ app_services = {
 #     "shared-frontend-dev" = { sku_name = "B2" }
 #   }
 app_service_shared_plans = {}
+
+# Functions 
+
+function_name = "func-mot-dev"
+location      = "eastus"
+resource_group_name = "rg-membership-eus2-01"
+
+app_service_plan_id = "/subscriptions/52d4f2d5-1678-49e1-b8f2-c67d79ee999f/resourceGroups/rg-membership-eus2-01/providers/Microsoft.Web/serverFarms/plan-mot-ui-dev"
+
+storage_account_name       = "cual de las 2 ?"  crear nuevo
+storage_account_access_key = "xxxxxxxxxxxxxxxx"
+
+functions_subnet_id = "/subscriptions/52d4f2d5-1678-49e1-b8f2-c67d79ee999f/resourceGroups/rg-membership-eus2-01/providers/Microsoft.Network/virtualNetworks/vnet-mot-dev/subnets/snet-functions"
+
+# cosmos_secret_uri = "i'm unauthorized to view these contents"

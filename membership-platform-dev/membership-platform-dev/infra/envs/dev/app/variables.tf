@@ -261,3 +261,20 @@ variable "app_service_shared_plans" {
   }))
   default = {}
 }
+
+
+
+# ---- functions ----
+
+variable "function_name" {}
+
+variable "app_service_plan_id" {}
+
+variable "storage_account_name" {}
+variable "storage_account_access_key" {
+  sensitive = true
+}
+
+variable "functions_subnet_id" {}
+
+variable "cosmos_secret_uri" {}
