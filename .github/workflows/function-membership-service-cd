@@ -80,7 +80,7 @@ on:
 jobs:
 
   # ─────────────────────────────
-  # 🌿 DEV – BUILD & DEPLOY
+  # 🌿 DEV – BUILD &amp; DEPLOY
   # ─────────────────────────────
   dev-deploy:
     name: "[dev] 🚀 Deploy Azure Function"
@@ -128,7 +128,7 @@ jobs:
       #
       #  
       # Service Principal: This method requires a service principal to authenticate and perform operations in the Azure environment. It is recommended for secure deployments and is the most common approach used by many developers
-      # https://learn.microsoft.com/en-us/azure/azure-functions/functions-how-to-github-actions?tabs=linux%2Cdotnet&pivots=method-manual
+      # https://learn.microsoft.com/en-us/azure/azure-functions/functions-how-to-github-actions?tabs=linux%2Cdotnet&amp;pivots=method-manual
       # ─────────────────────────────────────────
 
       # - name: Azure Login (Service Principal)
@@ -142,9 +142,9 @@ jobs:
       #     app-name: func-membership-dev
       #     package: backend
 
-  # ─────────────────────────────
-  # 🎭 STAGE – BUILD & DEPLOY
-  # ─────────────────────────────
+ # ─────────────────────────────
+ # 🎭 STAGE – BUILD &amp; DEPLOY
+ # ─────────────────────────────
   stage-deploy:
     name: "[stage] 🚀 Deploy Azure Function"
     if: |
@@ -172,9 +172,9 @@ jobs:
           cd backend
           npm run build
 
-      # ─────────────────────────────────────────
-      # ✅ USANDO PUBLISH PROFILE
-      # ─────────────────────────────────────────
+ # ─────────────────────────────────────────
+ # ✅ USANDO PUBLISH PROFILE
+ # ─────────────────────────────────────────
       - name: Deploy to Azure Functions (Publish Profile)
         uses: Azure/functions-action@v1
         with:
@@ -182,9 +182,9 @@ jobs:
           package: backend
           publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
 
-      # ─────────────────────────────────────────
-      # ✅ USANDO SERVICE PRINCIPAL
-      # ─────────────────────────────────────────
+ # ─────────────────────────────────────────
+ # ✅ USANDO SERVICE PRINCIPAL
+ # ─────────────────────────────────────────
       #
       # - name: Azure Login (Service Principal)
       #   uses: azure/login@v2
@@ -245,9 +245,11 @@ jobs:
 #        │   all functions) │
 #        └─────────────────┘
 #
+#
+#
+#----------------------------------------------------------------------------
 # Notes:
 # - One deployment publishes the entire Function App
 # - Multiple Node.js functions live inside the same app
 # - GitHub Environments control secrets and approvals
 # =============================================================================
-
