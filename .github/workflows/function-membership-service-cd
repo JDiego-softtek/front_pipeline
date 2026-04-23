@@ -1,5 +1,66 @@
 name: function-membership-service-cd
 
+
+
+# ───────────────────────────────────
+# 🚦 TRIGGER
+# Automatic: Runs ONLY when a PR is merged (not just closed) into dev or stage
+#   AND the PR contains at least one changed file under the `backend/` root
+#   directory. Closed PRs that were NOT merged are ignored.
+#   dev   branch  →  dev   environment approval
+#   stage branch  →  stage environment approval
+#
+# Manual (workflow_dispatch): Can be triggered from the GitHub Actions UI from
+#   ANY branch for testing purposes. Select the target environment (dev or
+#   stage) from the input dropdown. The selected environment alone determines
+#   which job pair runs – no branch restriction applies to manual runs.
+#
+# Future environments (e.g. pre-prod, prod) follow the same pattern:
+#   1. Add the branch name to the branches list below.
+#   2. Add the new value to the workflow_dispatch environment input choices.
+#   3. Add a new job pair (push + deploy) with the corresponding environment
+#      name and an `if:` condition covering both PR-merged and dispatch.
+#   4. Create the GitHub Environment in Repository → Settings → Environments.
+# ─────────────────────────────────────────────────────────────────────────────
+
+
+
+
+# ─────────────────────────────────────────────────────────────
+# 🔧 GITHUB ENVIRONMENTS – RECOMMENDED SETUP (Azure Functions)
+#
+# Create the following Environments in:
+#   Repository → Settings → Environments
+#
+# Environments:
+#   • dev
+#   • stage
+#   • (future: pre-prod, prod)
+#
+# Purpose:
+#   - Scope secrets per environment
+#   - Enable deployment approvals
+#   - Prevent accidental cross-environment deploys
+#
+# Required Secrets per Environment:
+#
+#   Option A – Publish Profile:
+#     • AZURE_FUNCTIONAPP_PUBLISH_PROFILE
+#       (XML publish profile of the Function App)
+#
+#   Option B – Service Principal (recommended for stage/prod):
+#     • AZURE_CREDENTIALS
+#       (Service principal JSON --sdk-auth)
+#
+# Notes:
+#   - Function App names are hardcoded in the pipeline
+#     (e.g. func-membership-dev, func-membership-stage)
+#   - One pipeline deploys the entire Function App
+# ─────────────────────────────────────────────────────────────
+
+
+
+
 on:
   pull_request:
     types: [closed]
@@ -50,6 +111,10 @@ jobs:
 
       # ─────────────────────────────────────────
       # ✅  USANDO PUBLISH PROFILE 
+      #
+      #  https://learn.microsoft.com/en-us/azure/azure-functions/functions-how-to-github-actions
+      #  “The publish profile is a valuable credential that allows access to Azure resources. Make sure you always transport and store it securely.”
+      #   Easy, fast, linked to a single function app
       # ─────────────────────────────────────────
       - name: Deploy to Azure Functions (Publish Profile)
         uses: Azure/functions-action@v1
@@ -60,8 +125,12 @@ jobs:
 
       # ─────────────────────────────────────────
       # ✅  USANDO SERVICE PRINCIPAL
-      # ─────────────────────────────────────────
       #
+      #  
+      # Service Principal: This method requires a service principal to authenticate and perform operations in the Azure environment. It is recommended for secure deployments and is the most common approach used by many developers
+      # https://learn.microsoft.com/en-us/azure/azure-functions/functions-how-to-github-actions?tabs=linux%2Cdotnet&pivots=method-manual
+      # ─────────────────────────────────────────
+
       # - name: Azure Login (Service Principal)
       #   uses: azure/login@v2
       #   with:
@@ -127,3 +196,58 @@ jobs:
       #   with:
       #     app-name: func-membership-stage
       #     package: backend
+
+
+
+
+
+
+# =============================================================================
+# 📦 FUNCTION MEMBERSHIP SERVICE – CD PIPELINE FLOW
+#
+# ┌──────────────┐
+# │   PR merged  │
+# │  (dev/stage) │
+# └──────┬───────┘
+#        │
+#        │  (or manual workflow_dispatch)
+#        ▼
+# ┌────────────────────┐
+# │ GitHub Actions CD  │
+# │   Workflow         │
+# └──────┬─────────────┘
+#        │
+#        ▼
+# ┌────────────────────┐
+# │ Setup Node.js (20) │
+# └──────┬─────────────┘
+#        │
+#        ▼
+# ┌────────────────────┐
+# │ npm ci + build     │
+# │ backend/           │
+# └──────┬─────────────┘
+#        │
+#        ▼
+# ┌──────────────────────────────────┐
+# │ Deploy Azure Function App         │
+# │ func-membership-{dev|stage}      │
+# │                                  │
+# │ Auth method per environment:     │
+# │  - Publish Profile (dev)          │
+# │  - Service Principal (stage/prod) │
+# └──────────────┬───────────────────┘
+#                │
+#                ▼
+#        ┌─────────────────┐
+#        │  Azure Functions │
+#        │  (entire app:    │
+#        │   all functions) │
+#        └─────────────────┘
+#
+# Notes:
+# - One deployment publishes the entire Function App
+# - Multiple Node.js functions live inside the same app
+# - GitHub Environments control secrets and approvals
+# =============================================================================
+
