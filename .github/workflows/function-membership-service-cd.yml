@@ -67,7 +67,7 @@ on:
     branches: [dev, stage]
     paths:
      # - backend/**
-      - front_pipeline/membership-platform-dev/membership-platform-dev/backend/**
+      - membership-platform-dev/membership-platform-dev/backend/**
 
   workflow_dispatch:
     inputs:
@@ -103,13 +103,13 @@ jobs:
       - name: Install dependencies
         run: |
           
-          cd front_pipeline/membership-platform-dev/membership-platform-dev/backend
+          cd membership-platform-dev/membership-platform-dev/backend
           npm ci
 # cambiar path de backend en ambiente real
 
       - name: Build
         run: |
-          cd front_pipeline/membership-platform-dev/membership-platform-dev/backend
+          cd membership-platform-dev/membership-platform-dev/backend
           npm run build
 # cambiar path de backend en ambiente real
 
@@ -127,7 +127,7 @@ jobs:
         uses: Azure/functions-action@v1
         with:
           app-name: func-membership-dev
-          package: front_pipeline/membership-platform-dev/membership-platform-dev/backend
+          package: membership-platform-dev/membership-platform-dev/backend
           publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
 # cambiar path de backend en ambiente real packase:backend
 
