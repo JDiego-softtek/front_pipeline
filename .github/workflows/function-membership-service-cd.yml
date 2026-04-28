@@ -102,10 +102,10 @@ jobs:
 
       - name: Install dependencies
         run: |
-          
           cd membership-platform-dev/membership-platform-dev/backend
-          npm ci
+          npm install
 # cambiar path de backend en ambiente real
+# npm ci en ligar de install en ambiente real
 
       - name: Build
         run: |
