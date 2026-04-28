@@ -263,4 +263,5 @@ jobs:
 # - One deployment publishes the entire Function App
 # - Multiple Node.js functions live inside the same app
 # - GitHub Environments control secrets and approvals
+# - This same workflow manages either Normal and/or durable fuctions depending with the configs in node.js file
 # =============================================================================
