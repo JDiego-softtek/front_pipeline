@@ -103,13 +103,13 @@ jobs:
       - name: Install dependencies
         run: |
           
-          cd front_pipeline/membership-platform-dev/membership-platform-dev/backend/
+          cd front_pipeline/membership-platform-dev/membership-platform-dev/backend
           npm ci
 # cambiar path de backend en ambiente real
 
       - name: Build
         run: |
-          cd front_pipeline/membership-platform-dev/membership-platform-dev/backend/
+          cd front_pipeline/membership-platform-dev/membership-platform-dev/backend
           npm run build
 # cambiar path de backend en ambiente real
 
