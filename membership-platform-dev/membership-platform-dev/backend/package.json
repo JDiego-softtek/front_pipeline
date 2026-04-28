@@ -1,3 +1,13 @@
+
+{
+  "name": "pipeline-test",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "echo build ok"
+  }
+}
+
+
 {
   "name": "membership-service",
   "version": "0.0.1",
