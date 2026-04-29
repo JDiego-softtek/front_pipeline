@@ -19,6 +19,11 @@ module "acr" {
   }
 }
 
+resource "azurerm_service_plan" "this" {
+  for_each = { functions = {} }
+  
+}
+
 module "functions" {
   source = "./functions-module"
 
