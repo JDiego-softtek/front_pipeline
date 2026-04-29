@@ -31,8 +31,8 @@ module "functions" {
     main = {
       storage_account_name  = local.functions_storage_account_name
       storage_account_id    = local.functions_storage_account_id
-#      service_plan_id       = azurerm_service_plan.this["functions"].id
-      service_plan_id = module.functions.service_plan_id
+      service_plan_id       = azurerm_service_plan.this["functions"].id
+     
 
     }
   }
