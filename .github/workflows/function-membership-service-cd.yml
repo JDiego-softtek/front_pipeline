@@ -80,6 +80,38 @@ on:
 
 jobs:
 
+# ---------------- CI - VALIDATION -------------------
+
+
+  ci:
+    name: "🧪 CI – Build backend"
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: |
+          cd membership-platform-dev/membership-platform-dev/backend
+          npm ci
+
+      - name: Build
+        run: |
+          cd membership-platform-dev/membership-platform-dev/backend
+          npm run build
+
+
+
+
+
+
+
+
+
   # ----------TERRAFORM INIT ------------------------------
 
   
@@ -107,7 +139,7 @@ jobs:
 
 
   # ─────────────────────────────
-  # 🌿 DEV – BUILD &amp; DEPLOY
+  # 🌿 DEV – BUILD & DEPLOY
   # ─────────────────────────────
   dev-deploy:
     name: "[dev] 🚀 Deploy Azure Function"
@@ -180,7 +212,7 @@ jobs:
            package: membership-platform-dev/membership-platform-dev/backend
 
  # ─────────────────────────────
- # 🎭 STAGE – BUILD &amp; DEPLOY
+ # 🎭 STAGE – BUILD & DEPLOY
  # ─────────────────────────────
   stage-deploy:
     name: "[stage] 🚀 Deploy Azure Function"
