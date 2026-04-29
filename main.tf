@@ -18,3 +18,25 @@ module "acr" {
     env = var.environment
   }
 }
+
+module "functions" {
+  source = "./modules/functions"
+
+  name                = var.function_name
+  location            = var.location
+  resource_group_name = var.resource_group_name
+
+
+  functions = {
+    main = {
+      storage_account_name  = local.functions_storage_account_name
+      storage_account_id    = local.functions_storage_account_id
+      service_plan_id       = azurerm_service_plan.this["functions"].id
+    }
+  }
+
+
+  # vnet_integration_subnet_id = local.subnet_id_functions
+
+
+}
