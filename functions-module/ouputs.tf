@@ -29,3 +29,7 @@ output "hostnames" {
     k => v.default_hostname
   }
 }
+
+output "service_plan_id" {
+  value = azurerm_service_plan.this.id
+}
