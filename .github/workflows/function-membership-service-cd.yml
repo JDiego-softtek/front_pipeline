@@ -100,6 +100,13 @@ jobs:
           npm install
           # npm ci -> for dev
 
+     
+      - name: Lint
+        run: |
+          cd membership-platform-dev/membership-platform-dev/backend
+          npm run lint
+     
+
       - name: Build
         run: |
           cd membership-platform-dev/membership-platform-dev/backend
