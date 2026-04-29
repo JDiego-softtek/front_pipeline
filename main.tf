@@ -8,7 +8,7 @@ resource "azurerm_resource_group" "rg" {
 }
 
 module "acr" {
-  source              = "./modules/acr"
+  source              = "./acr"
   acr_name            = var.acr_name
   resource_group_name = azurerm_resource_group.rg.name
   location            = var.location
@@ -20,7 +20,7 @@ module "acr" {
 }
 
 module "functions" {
-  source = "./modules/functions"
+  source = "./functions-module"
 
   name                = var.function_name
   location            = var.location
