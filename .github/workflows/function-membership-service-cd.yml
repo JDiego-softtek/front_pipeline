@@ -117,41 +117,41 @@ jobs:
 
 
       # ─────────────────────────────────────────
-      # ✅  USANDO PUBLISH PROFILE 
+      # ✅  USING PUBLISH PROFILE 
       #
       #  https://learn.microsoft.com/en-us/azure/azure-functions/functions-how-to-github-actions
       #  “The publish profile is a valuable credential that allows access to Azure resources. Make sure you always transport and store it securely.”
       #   Easy, fast, linked to a single function app
       # ─────────────────────────────────────────
-      - name: Deploy to Azure Functions (Publish Profile)
-        uses: Azure/functions-action@v1
-        with:
-          app-name: func-membership-dev
-          package: membership-platform-dev/membership-platform-dev/backend
-          publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
+      # - name: Deploy to Azure Functions (Publish Profile)
+      #  uses: Azure/functions-action@v1
+      #  with:
+      #    app-name: func-membership-dev
+      #    package: membership-platform-dev/membership-platform-dev/backend
+      #    publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
 # cambiar path de backend en ambiente real packase:backend
 
 
 
 
       # ─────────────────────────────────────────
-      # ✅  USANDO SERVICE PRINCIPAL
+      # ✅  USING SERVICE PRINCIPAL
       #
       #  
       # Service Principal: This method requires a service principal to authenticate and perform operations in the Azure environment. It is recommended for secure deployments and is the most common approach used by many developers
       # https://learn.microsoft.com/en-us/azure/azure-functions/functions-how-to-github-actions?tabs=linux%2Cdotnet&amp;pivots=method-manual
       # ─────────────────────────────────────────
 
-      # - name: Azure Login (Service Principal)
-      #   uses: azure/login@v2
-      #   with:
-      #     creds: ${{ secrets.AZURE_CREDENTIALS }}
-      #
-      # - name: Deploy to Azure Functions (Service Principal)
-      #   uses: Azure/functions-action@v1
-      #   with:
-      #     app-name: func-membership-dev
-      #     package: backend
+      - name: Azure Login (Service Principal)
+        uses: azure/login@v2
+        with:
+           creds: ${{ secrets.AZURE_CREDENTIALS }}
+      
+      - name: Deploy to Azure Functions (Service Principal)
+        uses: Azure/functions-action@v1
+        with:
+           app-name: func-membership-dev
+           package: backend
 
  # ─────────────────────────────
  # 🎭 STAGE – BUILD &amp; DEPLOY
@@ -184,29 +184,29 @@ jobs:
           npm run build
 
  # ─────────────────────────────────────────
- # ✅ USANDO PUBLISH PROFILE
+ # ✅ USING PUBLISH PROFILE
  # ─────────────────────────────────────────
-      - name: Deploy to Azure Functions (Publish Profile)
-        uses: Azure/functions-action@v1
-        with:
-          app-name: func-membership-stage
-          package: backend
-          publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
+ #     - name: Deploy to Azure Functions (Publish Profile)
+ #       uses: Azure/functions-action@v1
+ #       with:
+ #         app-name: func-membership-stage
+ #         package: backend
+ #         publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
 
  # ─────────────────────────────────────────
- # ✅ USANDO SERVICE PRINCIPAL
+ # ✅ USING SERVICE PRINCIPAL
  # ─────────────────────────────────────────
-      #
-      # - name: Azure Login (Service Principal)
-      #   uses: azure/login@v2
-      #   with:
-      #     creds: ${{ secrets.AZURE_CREDENTIALS }}
-      #
-      # - name: Deploy to Azure Functions (Service Principal)
-      #   uses: Azure/functions-action@v1
-      #   with:
-      #     app-name: func-membership-stage
-      #     package: backend
+      
+      - name: Azure Login (Service Principal)
+        uses: azure/login@v2
+        with:
+           creds: ${{ secrets.AZURE_CREDENTIALS }}
+      
+      - name: Deploy to Azure Functions (Service Principal)
+        uses: Azure/functions-action@v1
+        with:
+           app-name: func-membership-stage
+           package: backend
 
 
 
