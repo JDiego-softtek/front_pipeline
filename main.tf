@@ -8,7 +8,7 @@ resource "azurerm_resource_group" "rg" {
 }
 
 module "acr" {
-  source              = "./acr"
+  source              = "ACR-module"
   acr_name            = var.acr_name
   resource_group_name = azurerm_resource_group.rg.name
   location            = var.location
