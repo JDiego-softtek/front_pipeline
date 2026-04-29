@@ -175,7 +175,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          cd backend
+          cd membership-platform-dev/membership-platform-dev/backend
           npm ci
 
       - name: Build
