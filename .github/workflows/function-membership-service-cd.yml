@@ -306,14 +306,14 @@ jobs:
 # └──────┬─────────────┘
 #        │
 #        ▼
-# ┌──────────────────────────────────┐
-# │ Deploy Azure Function App         │
-# │ func-membership-{dev|stage}      │
-# │                                  │
-# │ Auth method per environment:     │
-# │  - Publish Profile (dev)          │
-# │  - Service Principal (stage/prod) │
-# └──────────────┬───────────────────┘
+# ┌──────────────────────────────────  ┐
+# │ Deploy Azure Function App          │
+# │ func-membership-{dev|stage}        │
+# │                                    │
+# │ Auth method per environment:       │
+# │  - Publish Profile                 │
+# │  - Service Principal (recommended) │
+# └──────────────┬──────────────────  ─┘
 #                │
 #                ▼
 #        ┌─────────────────┐
